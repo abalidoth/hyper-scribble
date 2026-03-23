@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://hfrvuitiyoln"]
+
+[ext_resource type="Script" uid="uid://bnknc6d04oex2" path="res://main_screen.gd" id="1_tjn2e"]
+
+[node name="MainScreen" type="Node2D" unique_id=543593682]
+script = ExtResource("1_tjn2e")
+radius = 250
+
+[node name="CircleCenter" type="Node2D" parent="." unique_id=77247471]
+unique_name_in_owner = true
+position = Vector2(548, 288)
+
+[node name="Primitives" type="Node2D" parent="." unique_id=833344019]
+position = Vector2(548, 288)

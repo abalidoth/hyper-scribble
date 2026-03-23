@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://38yrtltbilh"]
+
+[ext_resource type="Script" uid="uid://b0gem81qxgs0r" path="res://math-utils.gd" id="1_iqod6"]
+
+[node name="MathUtils" type="Node" unique_id=1330248558]
+script = ExtResource("1_iqod6")

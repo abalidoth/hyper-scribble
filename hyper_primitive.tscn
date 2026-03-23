@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dry3xiy7lhu7b"]
+
+[ext_resource type="Script" uid="uid://bjxepufgkyohe" path="res://hyper_primitive.gd" id="1_dwuxf"]
+
+[node name="HyperPrimitive" type="Node2D" unique_id=1999075147]
+script = ExtResource("1_dwuxf")
