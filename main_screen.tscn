@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://hfrvuitiyoln"]
 
 [ext_resource type="Script" uid="uid://bnknc6d04oex2" path="res://main_screen.gd" id="1_tjn2e"]
+[ext_resource type="PackedScene" uid="uid://15515o31pjxr" path="res://geometry_manager.tscn" id="2_w0p2i"]
 
 [node name="MainScreen" type="Node2D" unique_id=543593682]
 script = ExtResource("1_tjn2e")
@@ -10,5 +11,21 @@ radius = 250
 unique_name_in_owner = true
 position = Vector2(548, 288)
 
-[node name="Primitives" type="Node2D" parent="." unique_id=833344019]
+[node name="GeometryManager" parent="." unique_id=912047742 instance=ExtResource("2_w0p2i")]
+unique_name_in_owner = true
 position = Vector2(548, 288)
+
+[node name="ColorPicker" type="ColorPicker" parent="." unique_id=1680447916]
+unique_name_in_owner = true
+offset_left = 845.0
+offset_top = 6.0
+offset_right = 1143.0
+offset_bottom = 613.0
+edit_intensity = false
+
+[connection signal="begin_pan" from="." to="GeometryManager" method="_on_main_screen_begin_pan"]
+[connection signal="cancel_pan" from="." to="GeometryManager" method="_on_main_screen_cancel_pan"]
+[connection signal="draw_event" from="." to="GeometryManager" method="_on_main_screen_draw_event"]
+[connection signal="end_pan" from="." to="GeometryManager" method="_on_main_screen_end_pan"]
+[connection signal="pan_move" from="." to="GeometryManager" method="_on_main_screen_pan_move"]
+[connection signal="pan_out_of_bounds" from="." to="GeometryManager" method="_on_main_screen_pan_out_of_bounds"]

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://15515o31pjxr"]
+
+[ext_resource type="Script" uid="uid://c6ot7ysau3e0m" path="res://geometry_manager.gd" id="1_84ebg"]
+
+[node name="GeometryManager" type="Node2D" unique_id=912047742]
+script = ExtResource("1_84ebg")
