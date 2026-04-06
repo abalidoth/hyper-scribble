@@ -26,7 +26,7 @@ var current_view: MathUtils.mobius = MathUtils.mobius.id()
 
 func screen_vec_to_complex(pos: Vector2) -> MathUtils.complex:
 	var p: Vector2 = (pos - position)/screen_radius
-	return MathUtils.complex.new_complex(p.x,p.y)
+	return MathUtils.complex.new(p.x,p.y)
 	
 func complex_to_screen_vec(z: MathUtils.complex) -> Vector2:
 	return z.to_vec2()*screen_radius + position
@@ -34,7 +34,7 @@ func complex_to_screen_vec(z: MathUtils.complex) -> Vector2:
 func get_cache_complex(indices : Array[int]) -> Array[MathUtils.complex]:
 	var out : Array[MathUtils.complex] = []
 	for i in indices:
-		out.append(MathUtils.complex.new_complex(
+		out.append(MathUtils.complex.new(
 				cache_pool_r[i],
 				cache_pool_i[i]
 			))
@@ -48,9 +48,9 @@ func update_cache() -> void:
 		var n_i = true_pool_n_i[idx]
 		var d_r = true_pool_d_r[idx]
 		var d_i = true_pool_d_i[idx]
-		var n = MathUtils.complex.new_complex(n_r, n_i)
-		var d = MathUtils.complex.new_complex(d_r, d_i)
-		var h = MathUtils.hom_complex.new_hom(n,d)
+		var n = MathUtils.complex.new(n_r, n_i)
+		var d = MathUtils.complex.new(d_r, d_i)
+		var h = MathUtils.hom_complex.new(n,d)
 		var new_h = current_view.apply_to_hom(h)
 		var new_z = new_h.eval()
 		cache_pool_r.append(new_z.real)
@@ -236,16 +236,16 @@ func _on_main_screen_pan_out_of_bounds() -> void:
 func random_point() -> MathUtils.complex:
 	var theta = randf()* TAU
 	var r = sqrt(randf())
-	return MathUtils.complex.new_complex(r*cos(theta), r*sin(theta))
+	return MathUtils.complex.new(r*cos(theta), r*sin(theta))
 
 func _ready() -> void:
 	pass
-	#for i in range(20):
-		#create_segment(
-			#random_point(),
-			#random_point(),
-			#Color(sqrt(randf()),sqrt(randf()),sqrt(randf()))
-		#)
+	for i in range(500):
+		create_segment(
+			random_point(),
+			random_point(),
+			Color(sqrt(randf()),sqrt(randf()),sqrt(randf()))
+		)
 
 
 func _on_main_screen_draw_event(type: String, screen_loc: Vector2) -> void:

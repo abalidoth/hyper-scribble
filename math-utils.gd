@@ -4,43 +4,43 @@ class complex:
 	var real: float
 	var imag: float
 	
-	static func new_complex(a: float, b: float) -> complex:
-		var z = complex.new()
-		z.real = a
-		z.imag = b
-		return z
+	func _init(a:float, b:float):
+		real = a
+		imag = b
+	
 	
 	static func one() -> complex:
-		return new_complex(1,0)
+		return complex.new(1,0)
 	
 	static func zero() -> complex:
-		return new_complex(0,0)
+		return complex.new(0,0)
 		
 	func _to_string() -> String:
 		if imag >= 0:
 			return "%.3f + %.3fi"%[real, imag]
 		else:
 			return "%.3f - %.3fi"%[real, -imag]
+			
 	func conj() -> complex:
-		return new_complex(real, -imag)
+		return complex.new(real, -imag)
 		
 	func neg() -> complex:
-		return new_complex(-real, -imag)
+		return complex.new(-real, -imag)
 		
 	func add(z: complex) -> complex:
-		return new_complex(real + z.real, imag + z.imag)
+		return complex.new(real + z.real, imag + z.imag)
 		
 	func sub(z: complex) -> complex:
 		return add(z.neg())
 	
 	func mul(z: complex) -> complex:
-		return new_complex(real*z.real - imag*z.imag, real*z.imag + imag*z.real)
+		return complex.new(real*z.real - imag*z.imag, real*z.imag + imag*z.real)
 	
 	func norm_sqr() -> float:
 		return real*real + imag*imag
 		
 	func scale(l: float) -> complex:
-		return new_complex(real*l, imag*l)
+		return complex.new(real*l, imag*l)
 		
 	func div(z:complex) -> complex:
 		var n = 1/z.norm_sqr()
@@ -57,20 +57,20 @@ class hom_complex:
 	var num: complex
 	var den: complex
 	
-	static func new_hom(num: complex, den:complex) -> hom_complex:
-		var h = hom_complex.new()
-		h.num = num
-		h.den = den
-		return h
+	func _init(num_: complex, den_:complex):
+		num = num_
+		den = den_
+	
+
 		
 	static func from_complex(z:complex) -> hom_complex:
-		return new_hom(z,complex.one())
+		return hom_complex.new(z,complex.one())
 	
 	func eval() -> complex:
 		return num.div(den)
 	
 	func rescale(l: complex) -> hom_complex:
-		return new_hom(num.mul(l), den.mul(l))
+		return hom_complex.new(num.mul(l), den.mul(l))
 
 class mobius:
 	
@@ -79,16 +79,15 @@ class mobius:
 	var c: complex
 	var d: complex
 	
-	static func new_mobius(a:complex, b:complex, c:complex, d:complex) -> mobius:
-		var m = mobius.new()
-		m.a = a
-		m.b = b
-		m.c = c
-		m.d = d
-		return m
+	func _init(a_:complex, b_:complex, c_:complex, d_:complex):
+		a=a_
+		b=b_
+		c=c_
+		d=d_
+		
 		
 	static func id() -> mobius:
-		return new_mobius(
+		return mobius.new(
 			complex.one(),
 			complex.zero(),
 			complex.zero(),
@@ -98,10 +97,10 @@ class mobius:
 	func _to_string() -> String:
 		return "(%s)z + (%s)\n--------\n(%s)z + (%s)"%[a,b,c,d]
 	func scale(l: complex) -> mobius:
-		return new_mobius(a.mul(l), b.mul(l), c.mul(l), d.mul(l))
+		return mobius.new(a.mul(l), b.mul(l), c.mul(l), d.mul(l))
 		
 	func apply_to_hom(z:hom_complex) -> hom_complex:
-		return hom_complex.new_hom(
+		return hom_complex.new(
 			a.mul(z.num).add(b.mul(z.den)),
 			c.mul(z.num).add(d.mul(z.den))
 		)	
@@ -110,10 +109,10 @@ class mobius:
 		return a.mul(z).add(b).div(c.mul(z).add(d))
 	
 	func invert() -> mobius:
-		return new_mobius(d, b.neg(), c.neg(), a)
+		return mobius.new(d, b.neg(), c.neg(), a)
 		
 	func compose(m: mobius) -> mobius:
-		return new_mobius(
+		return mobius.new(
 			a.mul(m.a).add(b.mul(m.c)),
 			a.mul(m.b).add(b.mul(m.d)),
 			c.mul(m.a).add(d.mul(m.c)),
@@ -121,7 +120,7 @@ class mobius:
 		)
 	
 func center_translation(z:complex) -> mobius:
-	return mobius.new_mobius(complex.one(), z, z.conj(), complex.one())
+	return mobius.new(complex.one(), z, z.conj(), complex.one())
 
 func geodesic_translation(start:complex, end:complex) -> mobius:
 	var beta: complex = center_translation(start.neg()).apply_to_complex(end)
@@ -144,7 +143,7 @@ func geodesic_center(u: complex, v:complex) -> complex:
 	var center_x = (-sv*mv.real + mv.imag + su*mu.real - mu.imag) / (su - sv)
 	var center_y = su*center_x - su*mu.real + mu.imag
 	
-	return complex.new_complex(center_x, center_y)
+	return complex.new(center_x, center_y)
 	
 #func disk_to_screen(z: Vector2, screen_center: Vector2, radius: float):
 	#return z*radius + screen_center

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bnknc6d04oex2" path="res://main_screen.gd" id="1_tjn2e"]
 [ext_resource type="PackedScene" uid="uid://15515o31pjxr" path="res://geometry_manager.tscn" id="2_w0p2i"]
+[ext_resource type="PackedScene" uid="uid://vmtni5lwh5x7" path="res://tool_bar.tscn" id="3_7a4el"]
 
 [node name="MainScreen" type="Node2D" unique_id=543593682]
 script = ExtResource("1_tjn2e")
@@ -22,6 +23,8 @@ offset_top = 6.0
 offset_right = 1143.0
 offset_bottom = 613.0
 edit_intensity = false
+
+[node name="ToolBar" parent="." unique_id=1949241864 instance=ExtResource("3_7a4el")]
 
 [connection signal="begin_pan" from="." to="GeometryManager" method="_on_main_screen_begin_pan"]
 [connection signal="cancel_pan" from="." to="GeometryManager" method="_on_main_screen_cancel_pan"]

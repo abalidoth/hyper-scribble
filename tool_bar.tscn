@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://bml2scjkr8tbm" path="res://Assets/pen-swirl.svg" id="5_feg01"]
 [ext_resource type="Texture2D" uid="uid://cgylj58xmwe3n" path="res://Assets/draw-polygon.svg" id="6_cc52e"]
 
+[sub_resource type="Theme" id="Theme_feg01"]
+
 [node name="ToolBar" type="Control" unique_id=1949241864]
 layout_mode = 3
 anchors_preset = 15
@@ -14,6 +16,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = SubResource("Theme_feg01")
 script = ExtResource("1_bdfpa")
 
 [node name="BarVBox" type="VBoxContainer" parent="." unique_id=418330615]
