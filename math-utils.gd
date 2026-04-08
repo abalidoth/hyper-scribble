@@ -1,5 +1,12 @@
 extends Node
 
+func to_pi_range(theta:float) -> float:
+	var p: float = fposmod(theta,TAU)
+	if p < PI:
+		return p
+	else:
+		return p-TAU
+
 class complex:
 	var real: float
 	var imag: float

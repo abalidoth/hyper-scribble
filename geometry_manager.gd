@@ -17,12 +17,15 @@ var pan_center: MathUtils.complex = MathUtils.complex.zero()
 var line_start: MathUtils.complex
 var line_exists: bool = false
 
+var current_tool: String = "segment"
 
 var view_shifts: Array[MathUtils.mobius]
 
 var static_view: MathUtils.mobius = MathUtils.mobius.id()
 var pan_view: MathUtils.mobius = MathUtils.mobius.id()
 var current_view: MathUtils.mobius = MathUtils.mobius.id()
+
+
 
 func screen_vec_to_complex(pos: Vector2) -> MathUtils.complex:
 	var p: Vector2 = (pos - position)/screen_radius
@@ -111,20 +114,17 @@ class Primitive:
 class SegPrimitive extends Primitive:
 	var color : Color
 	
-	static func new_seg_primitive(
+	func _init(
 		start_point: int,
 		end_point: int,
 		color_: Color,
 		manager_: GeometryManager
 		
-	) -> SegPrimitive:
-		var p = SegPrimitive.new()
-		var idx:Array[int] = [start_point, end_point]
-		p.point_idx= idx
-		p.color = color_
-		p.manager = manager_
-		return p
-	
+	) -> void:
+		point_idx= [start_point, end_point]
+		color = color_
+		manager = manager_
+		
 	func draw()-> Array[Drawing]:
 		var ends = get_points()
 		var c = MathUtils.geodesic_center(ends[0], ends[1])
@@ -146,6 +146,91 @@ class SegPrimitive extends Primitive:
 			color
 		)]
 	
+class RayPrimitive extends Primitive:
+	var color : Color
+	
+	func _init(
+		start_point: int,
+		end_point: int,
+		color_: Color,
+		manager_: GeometryManager
+		
+	) -> void:
+		point_idx= [start_point, end_point]
+		color = color_
+		manager = manager_
+		
+	func draw()-> Array[Drawing]:
+		var ends = get_points()
+		var c = MathUtils.geodesic_center(ends[0], ends[1])
+		var r = sqrt(c.sub(ends[0]).norm_sqr())
+		var half_angle = asin(1/sqrt(c.norm_sqr()))
+		var radius_angle = c.neg().arg()
+		var end1 = fposmod(radius_angle - half_angle, TAU)
+		var end2 = fposmod(radius_angle + half_angle, TAU)
+		var p1 = fposmod((ends[0].sub(c)).arg(), TAU)
+		var p2 = fposmod((ends[1].sub(c)).arg(), TAU)
+		var a1: float = p1
+		var a2: float
+		
+		if sign(MathUtils.to_pi_range(end1-p1))==sign(MathUtils.to_pi_range(p2-p1)):
+			a2=end1
+		else:
+			a2=end2
+			
+		
+		
+		if abs(a1-a2)>PI:
+			if a1<a2:
+				a1+=TAU
+			else:
+				a2+=TAU
+
+		return [ArcDrawing.init(
+			c.to_vec2()*manager.screen_radius,
+			r*manager.screen_radius,
+			a1,
+			a2,
+			color
+		)]
+
+class LinePrimitive extends Primitive:
+	var color : Color
+	
+	func _init(
+		start_point: int,
+		end_point: int,
+		color_: Color,
+		manager_: GeometryManager
+		
+	) -> void:
+		point_idx= [start_point, end_point]
+		color = color_
+		manager = manager_
+		
+	func draw()-> Array[Drawing]:
+		var ends = get_points()
+		var c = MathUtils.geodesic_center(ends[0], ends[1])
+		var r = sqrt(c.sub(ends[0]).norm_sqr())
+		var half_angle = asin(1/sqrt(c.norm_sqr()))
+		var radius_angle = c.neg().arg()
+		var a1 = fposmod(radius_angle - half_angle, TAU)
+		var a2 = fposmod(radius_angle + half_angle, TAU)
+		
+		if abs(a1-a2)>PI:
+			if a1<a2:
+				a1+=TAU
+			else:
+				a2+=TAU
+
+		return [ArcDrawing.init(
+			c.to_vec2()*manager.screen_radius,
+			r*manager.screen_radius,
+			a1,
+			a2,
+			color
+		)]
+
 
 func add_hom_to_true(z:MathUtils.hom_complex) -> int:
 	true_pool_n_r.append(z.num.real)
@@ -154,10 +239,11 @@ func add_hom_to_true(z:MathUtils.hom_complex) -> int:
 	true_pool_d_i.append(z.den.imag)
 	return len(true_pool_n_r)-1
 
-func create_segment(
+func create_geodetic(
 	start_point: MathUtils.complex,
 	end_point: MathUtils.complex,
-	color: Color
+	color: Color,
+	type: String
 ) -> void:
 	
 	var start_hom : MathUtils.hom_complex = MathUtils.hom_complex.from_complex(start_point)
@@ -169,14 +255,31 @@ func create_segment(
 	var start_idx = add_hom_to_true(start_true)
 	var end_idx = add_hom_to_true(end_true)
 	update_cache()
-	var s: SegPrimitive = SegPrimitive.new_seg_primitive(
-		start_idx,
-		end_idx,
-		color,
-		self
-	)
+	var s: Primitive
+	if type == "segment":
+		s = SegPrimitive.new(
+			start_idx,
+			end_idx,
+			color,
+			self
+		)
+	elif type == "ray":
+		s = RayPrimitive.new(
+			start_idx,
+			end_idx,
+			color,
+			self
+		)
+	elif type == "line":
+		s = LinePrimitive.new(
+			start_idx,
+			end_idx,
+			color,
+			self
+		)
 	primitives.append(s)
 	queue_redraw()
+
 
 func _draw() -> void:
 	for p: Primitive in primitives:
@@ -240,33 +343,33 @@ func random_point() -> MathUtils.complex:
 
 func _ready() -> void:
 	pass
-	for i in range(500):
-		create_segment(
-			random_point(),
-			random_point(),
-			Color(sqrt(randf()),sqrt(randf()),sqrt(randf()))
-		)
+	#for i in range(500):
+		#create_segment(
+			#random_point(),
+			#random_point(),
+			#Color(sqrt(randf()),sqrt(randf()),sqrt(randf()))
+		#)
 
 
-func _on_main_screen_draw_event(type: String, screen_loc: Vector2) -> void:
+func _on_main_screen_draw_event(tool: String, event: String, screen_loc: Vector2) -> void:
 	var complex_loc: MathUtils.complex = screen_vec_to_complex(screen_loc)
-	if type == "segment_start":
-		print("segment start")
-		line_start = complex_loc
-	elif type == "segment_move":
-		if line_exists:
-			clear_last_primitive()
-		create_segment(line_start, complex_loc, %ColorPicker.color)
-		line_exists = true
-	elif type == "segment_cancel":
-		if line_exists:
-			clear_last_primitive()
-		line_exists = false
-	elif type == "segment_end":
-		line_exists = false
-	elif type == "segment_out_of_bounds":
-		if line_exists:
-			clear_last_primitive()
-		line_exists = false
+	if tool in ["segment", "ray", "line"]:
+		if event == "start":
+			line_start = complex_loc
+		elif event == "move":
+			if line_exists:
+				clear_last_primitive()
+			create_geodetic(line_start, complex_loc, %ColorPicker.color, tool)
+			line_exists = true
+		elif event == "cancel":
+			if line_exists:
+				clear_last_primitive()
+			line_exists = false
+		elif event == "end":
+			line_exists = false
+		elif event == "out_of_bounds":
+			if line_exists:
+				clear_last_primitive()
+			line_exists = false
 		
 	queue_redraw()

@@ -7,7 +7,10 @@
 [ext_resource type="Texture2D" uid="uid://bml2scjkr8tbm" path="res://Assets/pen-swirl.svg" id="5_feg01"]
 [ext_resource type="Texture2D" uid="uid://cgylj58xmwe3n" path="res://Assets/draw-polygon.svg" id="6_cc52e"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_feg01"]
+
 [sub_resource type="Theme" id="Theme_feg01"]
+Button/styles/normal = SubResource("StyleBoxFlat_feg01")
 
 [node name="ToolBar" type="Control" unique_id=1949241864]
 layout_mode = 3

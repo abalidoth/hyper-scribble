@@ -32,3 +32,4 @@ edit_intensity = false
 [connection signal="end_pan" from="." to="GeometryManager" method="_on_main_screen_end_pan"]
 [connection signal="pan_move" from="." to="GeometryManager" method="_on_main_screen_pan_move"]
 [connection signal="pan_out_of_bounds" from="." to="GeometryManager" method="_on_main_screen_pan_out_of_bounds"]
+[connection signal="tool_selected" from="ToolBar" to="." method="_on_tool_bar_tool_selected"]
