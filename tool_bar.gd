@@ -56,12 +56,12 @@ func _on_draw_main_button_pressed() -> void:
 	else:
 		%DrawSubTray.visible = true
 
-func _on_free_button_pressed() -> void:
+func _on_freehand_button_pressed() -> void:
 	handle_buttons(
 		%DrawSubTray,
 		%DrawMainButton,
-		%FreeButton,
-		"free"
+		%FreehandButton,
+		"freehand"
 	)
 
 

@@ -82,25 +82,35 @@ class ArcDrawing extends Drawing:
 	var radius: float
 	var start_angle : float
 	var end_angle : float
-	const points : int = 100
+	const points : int = 20
 	var color : Color
-	const thickness : float = 2.0
+	var thickness : float
 	
-	static func init(
+	func _init(
 		center_: Vector2,
 		radius_: float,
 		start_angle_ : float,
 		end_angle_: float,
-		color_: Color
-	) -> ArcDrawing:
-		var d : ArcDrawing = ArcDrawing.new()
-		d.center = center_
-		d.radius = radius_
-		d.start_angle = start_angle_
-		d.end_angle = end_angle_
-		d.color = color_
-		return d
+		color_: Color,
+		thickness_ : float
+	) -> void:
+		center = center_
+		radius = radius_
+		start_angle = start_angle_
+		end_angle = end_angle_
+		color = color_
+		thickness = thickness_
 	
+class PolylineDrawing extends Drawing:
+	
+	var points: Array[Vector2]
+	var thickness: float
+	var color: Color
+	
+	func _init(points_, thickness_, color_):
+		points = points_
+		thickness = thickness_
+		color = color_
 
 class Primitive:
 	var point_idx: Array[int]
@@ -113,16 +123,19 @@ class Primitive:
 		
 class SegPrimitive extends Primitive:
 	var color : Color
+	var thickness : float
 	
 	func _init(
 		start_point: int,
 		end_point: int,
 		color_: Color,
+		thickness_: float,
 		manager_: GeometryManager
 		
 	) -> void:
 		point_idx= [start_point, end_point]
 		color = color_
+		thickness = thickness_
 		manager = manager_
 		
 	func draw()-> Array[Drawing]:
@@ -138,27 +151,31 @@ class SegPrimitive extends Primitive:
 			else:
 				a2+=TAU
 
-		return [ArcDrawing.init(
+		return [ArcDrawing.new(
 			c.to_vec2()*manager.screen_radius,
 			r*manager.screen_radius,
 			a1,
 			a2,
-			color
+			color,
+			thickness
 		)]
 	
 class RayPrimitive extends Primitive:
 	var color : Color
+	var thickness : float
 	
 	func _init(
 		start_point: int,
 		end_point: int,
 		color_: Color,
+		thickness_: float,
 		manager_: GeometryManager
 		
 	) -> void:
 		point_idx= [start_point, end_point]
 		color = color_
 		manager = manager_
+		thickness = thickness_
 		
 	func draw()-> Array[Drawing]:
 		var ends = get_points()
@@ -186,26 +203,30 @@ class RayPrimitive extends Primitive:
 			else:
 				a2+=TAU
 
-		return [ArcDrawing.init(
+		return [ArcDrawing.new(
 			c.to_vec2()*manager.screen_radius,
 			r*manager.screen_radius,
 			a1,
 			a2,
-			color
+			color,
+			thickness
 		)]
 
 class LinePrimitive extends Primitive:
 	var color : Color
+	var thickness: float
 	
 	func _init(
 		start_point: int,
 		end_point: int,
 		color_: Color,
+		thickness_ : float,
 		manager_: GeometryManager
 		
 	) -> void:
 		point_idx= [start_point, end_point]
 		color = color_
+		thickness = thickness_
 		manager = manager_
 		
 	func draw()-> Array[Drawing]:
@@ -223,14 +244,38 @@ class LinePrimitive extends Primitive:
 			else:
 				a2+=TAU
 
-		return [ArcDrawing.init(
+		return [ArcDrawing.new(
 			c.to_vec2()*manager.screen_radius,
 			r*manager.screen_radius,
 			a1,
 			a2,
-			color
+			color,
+			thickness
 		)]
 
+class FreehandPrimitive extends Primitive:
+	var thickness : float
+	var color: Color
+	
+	func _init(color_ : Color, thickness_: float, manager_: GeometryManager) -> void:
+		color = color_
+		thickness = thickness_
+		manager = manager_
+	
+	func add_point(idx: int) -> void:
+		point_idx.append(idx)
+	
+	func draw() -> Array[Drawing]:
+		var complex_points = get_points()
+		var vec_points: Array[Vector2] = []
+		for z in complex_points:
+			vec_points.append(z.to_vec2() * manager.screen_radius)
+			
+		return [PolylineDrawing.new(
+			vec_points,
+			thickness,
+			color
+		)]
 
 func add_hom_to_true(z:MathUtils.hom_complex) -> int:
 	true_pool_n_r.append(z.num.real)
@@ -239,18 +284,19 @@ func add_hom_to_true(z:MathUtils.hom_complex) -> int:
 	true_pool_d_i.append(z.den.imag)
 	return len(true_pool_n_r)-1
 
+func complex_to_true(z: MathUtils.complex) -> MathUtils.hom_complex:
+	var z_hom : MathUtils.hom_complex = MathUtils.hom_complex.from_complex(z)
+	return current_view.invert().apply_to_hom(z_hom)
+
 func create_geodetic(
 	start_point: MathUtils.complex,
 	end_point: MathUtils.complex,
 	color: Color,
+	thickness: float,
 	type: String
 ) -> void:
-	
-	var start_hom : MathUtils.hom_complex = MathUtils.hom_complex.from_complex(start_point)
-	var end_hom: MathUtils.hom_complex = MathUtils.hom_complex.from_complex(end_point)
-	var to_true_coords: MathUtils.mobius = current_view.invert()
-	var start_true: MathUtils.hom_complex = to_true_coords.apply_to_hom(start_hom)
-	var end_true: MathUtils.hom_complex = to_true_coords.apply_to_hom(end_hom)
+	var start_true: MathUtils.hom_complex = complex_to_true(start_point)
+	var end_true: MathUtils.hom_complex = complex_to_true(end_point)
 	
 	var start_idx = add_hom_to_true(start_true)
 	var end_idx = add_hom_to_true(end_true)
@@ -261,6 +307,7 @@ func create_geodetic(
 			start_idx,
 			end_idx,
 			color,
+			thickness,
 			self
 		)
 	elif type == "ray":
@@ -268,6 +315,7 @@ func create_geodetic(
 			start_idx,
 			end_idx,
 			color,
+			thickness,
 			self
 		)
 	elif type == "line":
@@ -275,11 +323,38 @@ func create_geodetic(
 			start_idx,
 			end_idx,
 			color,
+			thickness,
 			self
 		)
 	primitives.append(s)
 	queue_redraw()
 
+func create_freehand(
+	start_point: MathUtils.complex,
+	color: Color,
+	thickness: float,
+) -> void:
+	var s: FreehandPrimitive
+	s = FreehandPrimitive.new(color, thickness, self)
+	
+	var start_hom : MathUtils.hom_complex = complex_to_true(start_point)
+	var start_idx : int = add_hom_to_true(start_hom)
+	
+	update_cache()
+
+	s.add_point(start_idx)
+	primitives.append(s)
+	
+func update_freehand(new_point: MathUtils.complex) -> void:
+	var s = primitives[-1]
+	assert(s is FreehandPrimitive, "Calling update_freehand when most recent primitive is not freehand")
+	var new_true = complex_to_true(new_point)
+	var new_idx = add_hom_to_true(new_true)
+	
+	update_cache()
+	
+	s.add_point(new_idx)
+	
 
 func _draw() -> void:
 	for p: Primitive in primitives:
@@ -291,6 +366,12 @@ func _draw() -> void:
 					d.radius,
 					d.start_angle,
 					d.end_angle,
+					d.points,
+					d.color,
+					d.thickness
+				)
+			elif d is PolylineDrawing:
+				draw_polyline(
 					d.points,
 					d.color,
 					d.thickness
@@ -344,22 +425,26 @@ func random_point() -> MathUtils.complex:
 func _ready() -> void:
 	pass
 	#for i in range(500):
-		#create_segment(
+		#create_geodetic(
 			#random_point(),
 			#random_point(),
-			#Color(sqrt(randf()),sqrt(randf()),sqrt(randf()))
+			#Color(sqrt(randf()),sqrt(randf()),sqrt(randf())),
+			#randi_range(1,5),
+			#"line"
 		#)
 
 
 func _on_main_screen_draw_event(tool: String, event: String, screen_loc: Vector2) -> void:
 	var complex_loc: MathUtils.complex = screen_vec_to_complex(screen_loc)
+	var color: Color= %ColorPicker.color
+	var thickness: float =  %ThicknessSlider.value
 	if tool in ["segment", "ray", "line"]:
 		if event == "start":
 			line_start = complex_loc
 		elif event == "move":
 			if line_exists:
 				clear_last_primitive()
-			create_geodetic(line_start, complex_loc, %ColorPicker.color, tool)
+			create_geodetic(line_start, complex_loc, color , thickness, tool)
 			line_exists = true
 		elif event == "cancel":
 			if line_exists:
@@ -371,5 +456,26 @@ func _on_main_screen_draw_event(tool: String, event: String, screen_loc: Vector2
 			if line_exists:
 				clear_last_primitive()
 			line_exists = false
+	elif tool == "freehand":
+		if event == "start":
+			create_freehand(complex_loc,color, thickness)
+		elif event == "new_point":
+			update_freehand(complex_loc)
+			
 		
+	queue_redraw()
+
+func _on_dialog_clear() -> void:
+	primitives = []
+	for a in [
+		true_pool_n_r,
+		true_pool_n_i,
+		true_pool_d_r,
+		true_pool_d_i,
+		cache_pool_r,
+		cache_pool_i
+	]:
+		a = []
+	
+	current_view = MathUtils.mobius.id()
 	queue_redraw()

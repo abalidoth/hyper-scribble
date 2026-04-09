@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://bnknc6d04oex2" path="res://main_screen.gd" id="1_tjn2e"]
 [ext_resource type="PackedScene" uid="uid://15515o31pjxr" path="res://geometry_manager.tscn" id="2_w0p2i"]
 [ext_resource type="PackedScene" uid="uid://vmtni5lwh5x7" path="res://tool_bar.tscn" id="3_7a4el"]
+[ext_resource type="Theme" uid="uid://c81xmkp0npp1l" path="res://tool_theme.tres" id="4_4sclt"]
+[ext_resource type="Texture2D" uid="uid://0cnao7lug2fb" path="res://Assets/add-document.svg" id="5_ywh4s"]
 
 [node name="MainScreen" type="Node2D" unique_id=543593682]
 script = ExtResource("1_tjn2e")
@@ -26,6 +28,45 @@ edit_intensity = false
 
 [node name="ToolBar" parent="." unique_id=1949241864 instance=ExtResource("3_7a4el")]
 
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=253272064]
+custom_minimum_size = Vector2(200, 0)
+offset_left = 9.0
+offset_top = 474.0
+offset_right = 49.0
+offset_bottom = 514.0
+
+[node name="ThicknessBox" type="HBoxContainer" parent="VBoxContainer" unique_id=685796942]
+layout_mode = 2
+
+[node name="Thickness" type="Label" parent="VBoxContainer/ThicknessBox" unique_id=1298585384]
+layout_mode = 2
+text = "Thickness"
+
+[node name="ThicknessSlider" type="HSlider" parent="VBoxContainer/ThicknessBox" unique_id=953072049]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 20.0
+value = 5.0
+rounded = true
+
+[node name="ThicknessValue" type="Label" parent="VBoxContainer/ThicknessBox" unique_id=1447979126]
+unique_name_in_owner = true
+layout_mode = 2
+text = "5"
+
+[node name="BottomBar" type="HBoxContainer" parent="." unique_id=37382991]
+offset_left = 304.0
+offset_top = 581.0
+offset_right = 344.0
+offset_bottom = 621.0
+theme = ExtResource("4_4sclt")
+
+[node name="ClearButton" type="Button" parent="BottomBar" unique_id=1190013845]
+layout_mode = 2
+icon = ExtResource("5_ywh4s")
+
 [connection signal="begin_pan" from="." to="GeometryManager" method="_on_main_screen_begin_pan"]
 [connection signal="cancel_pan" from="." to="GeometryManager" method="_on_main_screen_cancel_pan"]
 [connection signal="draw_event" from="." to="GeometryManager" method="_on_main_screen_draw_event"]
@@ -33,3 +74,5 @@ edit_intensity = false
 [connection signal="pan_move" from="." to="GeometryManager" method="_on_main_screen_pan_move"]
 [connection signal="pan_out_of_bounds" from="." to="GeometryManager" method="_on_main_screen_pan_out_of_bounds"]
 [connection signal="tool_selected" from="ToolBar" to="." method="_on_tool_bar_tool_selected"]
+[connection signal="value_changed" from="VBoxContainer/ThicknessBox/ThicknessSlider" to="." method="_on_thickness_slider_value_changed"]
+[connection signal="pressed" from="BottomBar/ClearButton" to="." method="_on_clear_button_pressed"]

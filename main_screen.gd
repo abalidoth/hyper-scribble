@@ -3,6 +3,7 @@ extends Node2D
 
 var panning = false
 var drawing = false
+var freehand_oob = false
 
 signal begin_pan(pan_center:Vector2)
 signal pan_move(move_loc: Vector2)
@@ -43,6 +44,17 @@ func _input(event: InputEvent) -> void:
 				elif not event.pressed and drawing and not valid:
 					drawing = false
 					draw_event.emit(current_tool, "cancel", event.position)
+			
+			elif current_tool == "freehand":
+				if event.pressed and valid:
+					drawing = true
+					draw_event.emit(current_tool, "start", event.position)
+				elif not event.pressed and drawing and valid:
+					drawing = false
+					draw_event.emit(current_tool, "end", event.position)
+				elif not event.pressed and freehand_oob:
+					freehand_oob = false
+					
 		
 		
 		#Pan button
@@ -79,8 +91,38 @@ func _input(event: InputEvent) -> void:
 				else:
 					print("emit out of bounds")
 					draw_event.emit(current_tool, "out_of_bounds", event.position)
+			elif current_tool == "freehand":
+				if valid and drawing and not freehand_oob:
+					draw_event.emit(current_tool, "new_point", event.position)
+				elif valid and not drawing and freehand_oob:
+					draw_event.emit(current_tool, "start", event.position)
+					freehand_oob = false
+					drawing = true
+				elif drawing and not valid:
+					draw_event.emit(current_tool, "end", event.position)
+					drawing = false
+					freehand_oob = true
+					
 				
 
 
 func _on_tool_bar_tool_selected(tool: String) -> void:
 	current_tool = tool
+
+
+func _on_thickness_slider_value_changed(value: float) -> void:
+	%ThicknessValue.text = "%d"%value
+
+
+func _on_clear_button_pressed() -> void:
+	# Create dialog
+	var dialog = ConfirmationDialog.new() 
+	dialog.title = "Clear Screen" 
+	dialog.dialog_text = "This operation cannot be undone, are you sure to clear screen?"
+
+	# connect signal
+	dialog.confirmed.connect(%GeometryManager._on_dialog_clear)
+	# show dialog
+	add_child(dialog)	
+	dialog.popup_centered() # center on screen
+	dialog.show()

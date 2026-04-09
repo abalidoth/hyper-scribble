@@ -1,16 +1,12 @@
 [gd_scene format=3 uid="uid://vmtni5lwh5x7"]
 
 [ext_resource type="Script" uid="uid://bwia8yfwtipot" path="res://tool_bar.gd" id="1_bdfpa"]
+[ext_resource type="Theme" uid="uid://c81xmkp0npp1l" path="res://tool_theme.tres" id="1_cc52e"]
 [ext_resource type="Texture2D" uid="uid://qxybm1kjdfnk" path="res://Assets/slash.svg" id="1_xieyy"]
 [ext_resource type="Texture2D" uid="uid://5g540c1bc7ol" path="res://Assets/arrow-up-right.svg" id="3_t1wli"]
 [ext_resource type="Texture2D" uid="uid://bmri63rdmba2o" path="res://Assets/arrow-up-right-and-arrow-down-left-from-center.svg" id="4_feg01"]
 [ext_resource type="Texture2D" uid="uid://bml2scjkr8tbm" path="res://Assets/pen-swirl.svg" id="5_feg01"]
 [ext_resource type="Texture2D" uid="uid://cgylj58xmwe3n" path="res://Assets/draw-polygon.svg" id="6_cc52e"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_feg01"]
-
-[sub_resource type="Theme" id="Theme_feg01"]
-Button/styles/normal = SubResource("StyleBoxFlat_feg01")
 
 [node name="ToolBar" type="Control" unique_id=1949241864]
 layout_mode = 3
@@ -19,7 +15,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource("Theme_feg01")
+theme = ExtResource("1_cc52e")
 script = ExtResource("1_bdfpa")
 
 [node name="BarVBox" type="VBoxContainer" parent="." unique_id=418330615]
@@ -68,7 +64,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="FreeButton" type="Button" parent="BarVBox/DrawTray/DrawSubTray" unique_id=1147185152]
+[node name="FreehandButton" type="Button" parent="BarVBox/DrawTray/DrawSubTray" unique_id=1147185152]
 unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("5_feg01")
@@ -83,5 +79,5 @@ icon = ExtResource("6_cc52e")
 [connection signal="pressed" from="BarVBox/LineTray/LineSubTray/RayButton" to="." method="_on_ray_button_pressed"]
 [connection signal="pressed" from="BarVBox/LineTray/LineSubTray/LineButton" to="." method="_on_line_button_pressed"]
 [connection signal="pressed" from="BarVBox/DrawTray/DrawMainButton" to="." method="_on_draw_main_button_pressed"]
-[connection signal="pressed" from="BarVBox/DrawTray/DrawSubTray/FreeButton" to="." method="_on_free_button_pressed"]
+[connection signal="pressed" from="BarVBox/DrawTray/DrawSubTray/FreehandButton" to="." method="_on_freehand_button_pressed"]
 [connection signal="pressed" from="BarVBox/DrawTray/DrawSubTray/PolyButton" to="." method="_on_poly_button_pressed"]
