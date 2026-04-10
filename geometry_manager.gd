@@ -270,12 +270,14 @@ class FreehandPrimitive extends Primitive:
 		var vec_points: Array[Vector2] = []
 		for z in complex_points:
 			vec_points.append(z.to_vec2() * manager.screen_radius)
-			
-		return [PolylineDrawing.new(
-			vec_points,
-			thickness,
-			color
-		)]
+		if len(vec_points) < 2:
+			return []
+		else:
+			return [PolylineDrawing.new(
+				vec_points,
+				thickness,
+				color
+			)]
 
 func add_hom_to_true(z:MathUtils.hom_complex) -> int:
 	true_pool_n_r.append(z.num.real)

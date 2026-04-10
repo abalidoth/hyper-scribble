@@ -4,6 +4,7 @@ extends Node2D
 var panning = false
 var drawing = false
 var freehand_oob = false
+var background_color : Color = Color.WHITE
 
 signal begin_pan(pan_center:Vector2)
 signal pan_move(move_loc: Vector2)
@@ -25,7 +26,7 @@ func _ready() -> void:
 	queue_redraw()
 	
 func _draw() -> void:
-	draw_circle($CircleCenter.position,radius,Color.WHITE, false)
+	draw_circle($CircleCenter.position,radius,background_color, true)
 		
 func _input(event: InputEvent) -> void:
 	var valid:bool = false
@@ -126,3 +127,8 @@ func _on_clear_button_pressed() -> void:
 	add_child(dialog)	
 	dialog.popup_centered() # center on screen
 	dialog.show()
+
+
+func _on_background_button_pressed() -> void:
+	background_color = %ColorPicker.color
+	queue_redraw()

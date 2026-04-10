@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://vmtni5lwh5x7" path="res://tool_bar.tscn" id="3_7a4el"]
 [ext_resource type="Theme" uid="uid://c81xmkp0npp1l" path="res://tool_theme.tres" id="4_4sclt"]
 [ext_resource type="Texture2D" uid="uid://0cnao7lug2fb" path="res://Assets/add-document.svg" id="5_ywh4s"]
+[ext_resource type="Texture2D" uid="uid://bbw2w262h70g7" path="res://Assets/background.svg" id="6_ywh4s"]
 
 [node name="MainScreen" type="Node2D" unique_id=543593682]
 script = ExtResource("1_tjn2e")
@@ -24,6 +25,7 @@ offset_left = 845.0
 offset_top = 6.0
 offset_right = 1143.0
 offset_bottom = 613.0
+color = Color(0, 0, 0, 1)
 edit_intensity = false
 
 [node name="ToolBar" parent="." unique_id=1949241864 instance=ExtResource("3_7a4el")]
@@ -65,7 +67,13 @@ theme = ExtResource("4_4sclt")
 
 [node name="ClearButton" type="Button" parent="BottomBar" unique_id=1190013845]
 layout_mode = 2
+tooltip_text = "Clear Drawing"
 icon = ExtResource("5_ywh4s")
+
+[node name="BackgroundButton" type="Button" parent="BottomBar" unique_id=403355581]
+layout_mode = 2
+tooltip_text = "Change Background to Current Color"
+icon = ExtResource("6_ywh4s")
 
 [connection signal="begin_pan" from="." to="GeometryManager" method="_on_main_screen_begin_pan"]
 [connection signal="cancel_pan" from="." to="GeometryManager" method="_on_main_screen_cancel_pan"]
@@ -76,3 +84,4 @@ icon = ExtResource("5_ywh4s")
 [connection signal="tool_selected" from="ToolBar" to="." method="_on_tool_bar_tool_selected"]
 [connection signal="value_changed" from="VBoxContainer/ThicknessBox/ThicknessSlider" to="." method="_on_thickness_slider_value_changed"]
 [connection signal="pressed" from="BottomBar/ClearButton" to="." method="_on_clear_button_pressed"]
+[connection signal="pressed" from="BottomBar/BackgroundButton" to="." method="_on_background_button_pressed"]
